@@ -1,0 +1,23 @@
+{
+    "name": "man-common-component-react",
+    "version": "0.1.0",
+    "description": "",
+    "main": "lib/index.js",
+    "scripts": {
+        "build": "del /q .\\lib && tsc"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ManGlasses/man-common-component-react.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "react": "^16.12.0",
+        "react-dom": "^16.12.0",
+        "typescript": "^3.7.5"
+    },
+    "dependencies": {
+        "@types/react": "^16.9.19"
+    }
+}
