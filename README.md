@@ -1,0 +1,1 @@
+"# man-common-component-react" 
