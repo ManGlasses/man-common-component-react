@@ -1,2 +1,5 @@
+export * from './config'
 export * from './FormContext'
-export * from './Input'
+export * from './InputField/useInputField'
+export * from './InputField/InputFieldView'
+export * from './InputField'

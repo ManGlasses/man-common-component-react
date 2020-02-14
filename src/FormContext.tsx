@@ -5,7 +5,7 @@ export interface IFormProviderProps {
     form: FormApi
 }
 
-const FormContext = createContext<IFormProviderProps>({ form: {} as FormApi })
+const FormContext = createContext({} as IFormProviderProps)
 
 export const FormProvider: React.FC<IFormProviderProps> = ({ form, children }) => {
     return <FormContext.Provider value={{ form }}>{children}</FormContext.Provider>
