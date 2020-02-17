@@ -3,11 +3,11 @@ import { TextFieldProps } from '@material-ui/core/TextField'
 import useInputField, { UseInputFieldProps } from './InputField/useInputField'
 import InputFieldView from './InputField/InputFieldView'
 
-export type InputProps = TextFieldProps & UseInputFieldProps
+export type InputProps = UseInputFieldProps & TextFieldProps
 
-const InputField: React.FC<InputProps> = ({ form, name, validate, validatingRequired, ...others }) => {
-    const input = useInputField({ form, name, validate, validatingRequired })
-    return <InputFieldView {...input} {...{ validatingRequired }} {...others} />
+const InputField: React.FC<InputProps> = ({ form, fieldName, validate, validatingRequired, ...others }) => {
+    const inputField = useInputField({ form, fieldName, validate, validatingRequired })
+    return <InputFieldView {...inputField} {...{ validatingRequired }} {...others} />
 }
 
 export default InputField

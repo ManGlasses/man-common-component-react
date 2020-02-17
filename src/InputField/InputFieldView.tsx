@@ -9,7 +9,16 @@ export type InputFieldViewProps = TextFieldProps & {
 
 const InputFieldView: React.FC<InputFieldViewProps> = ({ field, validatingRequired, ...others }) => {
     const error = field.meta.touched && (field.meta.error || field.meta.submitError)
-    return <TextField {...field.input} required={validatingRequired} error={!!error} helperText={error} {...others} />
+    return (
+        <TextField
+            {...field.input}
+            required={validatingRequired}
+            error={!!error}
+            helperText={error}
+            InputLabelProps={{ shrink: true }}
+            {...others}
+        />
+    )
 }
 
 export default InputFieldView
