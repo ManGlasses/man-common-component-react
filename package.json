@@ -25,6 +25,8 @@
         "@types/react-virtualized": "^9.21.8",
         "downshift": "^5.0.0",
         "final-form": "^4.18.7",
+        "final-form-arrays": "^3.0.2",
+        "react-final-form-arrays": "^3.1.1",
         "react-final-form-hooks": "^2.0.2",
         "react-virtualized": "^9.21.2",
         "resize-observer-polyfill": "^1.5.1"
