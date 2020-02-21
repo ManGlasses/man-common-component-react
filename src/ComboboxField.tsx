@@ -1,9 +1,8 @@
 import React from 'react'
-import { TextFieldProps } from '@material-ui/core/TextField'
 import useComboboxField, { UseComboboxFieldProps } from './ComboboxField/useComboboxField'
-import ComboboxFieldView from './ComboboxField/ComboboxFieldView'
+import ComboboxFieldView, { ComboboxFieldViewProps } from './ComboboxField/ComboboxFieldView'
 
-export type ComboboxFieldProps = UseComboboxFieldProps & TextFieldProps
+export type ComboboxFieldProps = UseComboboxFieldProps & ComboboxFieldViewProps
 
 const ComboboxField: React.FC<ComboboxFieldProps> = ({
     fieldName,
