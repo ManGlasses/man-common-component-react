@@ -2,7 +2,7 @@ import React, { createContext, useContext } from 'react'
 import { FormApi } from 'final-form'
 
 export interface IFormProviderProps {
-    form: FormApi
+    form: FormApi<any>
 }
 
 const FormContext = createContext({} as IFormProviderProps)

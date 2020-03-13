@@ -7,7 +7,7 @@ import { composeValidators } from '../utils/validate'
 import { requiredText } from '../config'
 
 export interface UseComboboxFieldProps {
-    form?: FormApi
+    form?: FormApi<any>
     fieldName: string
     validate?: FieldValidator<any>[]
     validatingRequired?: boolean
@@ -26,21 +26,23 @@ const useComboboxField = ({
     searchKeys,
 }: UseComboboxFieldProps) => {
     const formConsumer = useFormConsumer()
+    const finalForm = form || formConsumer.form
 
     let mergeValidate = validate || []
     if (validatingRequired) {
         mergeValidate.push((value: any) => (value ? undefined : requiredText))
     }
 
-    const field = useField(fieldName, form || formConsumer.form, composeValidators(...mergeValidate))
+    const field = useField(fieldName, finalForm, composeValidators(...mergeValidate))
     const [inputItems, setInputItems] = useState(items)
     const [inputHighlightedIndex, setInputHighlightedIndex] = useState(-1)
     const [scrollIndex, setScrollIndex] = useState(0)
 
     const combobox = useCombobox({
+        defaultHighlightedIndex: inputHighlightedIndex,
         selectedItem: items.filter(item => field.input.value === item[uniqueKey])?.[0],
         items: inputItems,
-        highlightedIndex: inputHighlightedIndex,
+        // highlightedIndex: inputHighlightedIndex,
         onIsOpenChange: ({ isOpen, selectedItem }) => {
             if (isOpen) {
                 const selectedItemIndex = items.findIndex(item => selectedItem?.[uniqueKey] === item[uniqueKey])
@@ -75,7 +77,7 @@ const useComboboxField = ({
     })
 
     useEffect(() => {
-        formConsumer.form.mutators.setFieldData(name, { ...combobox.selectedItem })
+        finalForm.mutators.setFieldData(name, { ...combobox.selectedItem })
     }, [combobox.selectedItem])
 
     const onKeyDownInput = (event: KeyboardEvent) => {
@@ -104,21 +106,11 @@ const useComboboxField = ({
         }
     }
 
-    const createTextFromItem = (item: object, searchKeys: string[]) => {
-        return item
-            ? searchKeys
-                  .filter(searchKey => !!item[searchKey])
-                  .map(searchKey => item[searchKey])
-                  .join(', ')
-            : ''
-    }
-
     return {
         inputItems,
         scrollIndex,
         combobox,
         onKeyDownInput,
-        createTextFromItem,
     }
 }
 

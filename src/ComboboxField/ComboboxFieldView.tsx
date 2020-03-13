@@ -9,6 +9,7 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import Popover from '@material-ui/core/Popover'
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
+import SearchIcon from '@material-ui/icons/Search'
 import { UseComboboxReturnValue } from 'downshift'
 import useResizeObserver from '../utils/useResizeObserver'
 import usePrevious from '../utils/usePrevious'
@@ -18,9 +19,9 @@ export type ComboboxFieldViewProps = TextFieldProps & {
     scrollIndex: number
     combobox: UseComboboxReturnValue<object>
     onKeyDownInput: (event: KeyboardEvent) => void
-    createTextFromItem: (item: object, searchKeys: string[]) => string
     uniqueKey: string
     searchKeys: string[]
+    TextFieldSearchProps?: TextFieldProps
 }
 
 const rowHeight = 48
@@ -28,6 +29,15 @@ const cache = new CellMeasurerCache({
     defaultHeight: rowHeight,
     fixedWidth: true,
 })
+
+const createTextFromItem = (item: object, searchKeys: string[]) => {
+    return item
+        ? searchKeys
+              .filter(searchKey => !!item[searchKey])
+              .map(searchKey => item[searchKey])
+              .join(', ')
+        : ''
+}
 
 const useStyles = makeStyles(theme => ({
     root: { width: '100%', height: '100%' },
@@ -44,13 +54,15 @@ const ComboboxFieldView: React.FC<ComboboxFieldViewProps> = ({
     scrollIndex,
     combobox,
     onKeyDownInput,
-    createTextFromItem,
 
     uniqueKey,
     searchKeys,
 
     placeholder,
     rowsMax = 10,
+
+    TextFieldSearchProps,
+
     ...others
 }) => {
     cache.clearAll()
@@ -68,18 +80,19 @@ const ComboboxFieldView: React.FC<ComboboxFieldViewProps> = ({
 
     const textItem = createTextFromItem(combobox.selectedItem, searchKeys)
 
+    const inputProps = combobox.getInputProps()
+    delete inputProps.value
+
     return (
         <div {...combobox.getComboboxProps()} className={classes.root}>
             <TextField
                 multiline
                 ref={anchorEl}
-                InputLabelProps={{ ...combobox.getLabelProps(), shrink: true }}
+                {...others}
+                InputLabelProps={{ ...others.InputLabelProps, ...combobox.getLabelProps() }}
                 InputProps={{
-                    ...combobox.getInputProps(), //กัน error
-                    value: textItem, //กัน error
-                    onChange: () => {}, //กัน error
-                    onFocus: () => {}, //กัน error
-                    onBlur: () => {}, //กัน error
+                    ...others.InputProps,
+                    value: textItem,
                     readOnly: true,
                     endAdornment: (
                         <InputAdornment
@@ -100,7 +113,6 @@ const ComboboxFieldView: React.FC<ComboboxFieldViewProps> = ({
                     combobox.setInputValue('')
                     combobox.openMenu()
                 }}
-                {...others}
             />
 
             <Popover
@@ -112,15 +124,21 @@ const ComboboxFieldView: React.FC<ComboboxFieldViewProps> = ({
             >
                 <Paper square {...(combobox.isOpen ? { ...combobox.getMenuProps() } : {})}>
                     <TextField
+                        {...TextFieldSearchProps}
                         autoFocus
                         fullWidth
                         multiline
                         inputRef={inputItemRef}
                         placeholder={textItem || placeholder}
                         InputProps={{
-                            ...combobox.getInputProps(),
+                            startAdornment: (
+                                <InputAdornment position='start'>
+                                    <SearchIcon />
+                                </InputAdornment>
+                            ),
+                            ...TextFieldSearchProps?.InputProps,
+                            ...inputProps,
                             onKeyDown: onKeyDownInput,
-                            onBlur: () => {}, //กัน error
                         }}
                         className={classes.searchInput}
                         {...{ rowsMax }}
@@ -157,8 +175,10 @@ const ComboboxFieldView: React.FC<ComboboxFieldViewProps> = ({
                                             selected={isHoverItem}
                                             {...combobox.getItemProps({ item })}
                                             onClick={() => {
-                                                combobox.closeMenu()
-                                                combobox.selectItem(item)
+                                                setTimeout(() => {
+                                                    combobox.selectItem(item)
+                                                    combobox.closeMenu()
+                                                }, 0)
                                             }}
                                             {...{ style }}
                                             ref={() => {}} //กัน error
