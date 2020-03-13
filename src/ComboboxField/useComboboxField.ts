@@ -13,7 +13,7 @@ export interface UseComboboxFieldProps {
     validatingRequired?: boolean
     items: object[]
     uniqueKey: string
-    searchKeys: string[]
+    searchKeys?: string[]
 }
 
 const useComboboxField = ({
@@ -53,7 +53,7 @@ const useComboboxField = ({
         },
         onInputValueChange: ({ inputValue }) => {
             const filtered = items.filter(item =>
-                searchKeys.some(searchKey =>
+                searchKeys?.some(searchKey =>
                     item[searchKey]
                         ?.toString()
                         ?.toLowerCase()

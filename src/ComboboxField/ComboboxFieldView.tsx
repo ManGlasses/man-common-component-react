@@ -20,8 +20,11 @@ export type ComboboxFieldViewProps = TextFieldProps & {
     combobox: UseComboboxReturnValue<object>
     onKeyDownInput: (event: KeyboardEvent) => void
     uniqueKey: string
-    searchKeys: string[]
+    labelKey: string
+    searchKeys?: string[]
     TextFieldSearchProps?: TextFieldProps
+    renderTextItem?: (item: any, index: number) => React.ReactElement
+    renderNoData?: (searchValue?: string) => React.ReactElement
 }
 
 const rowHeight = 48
@@ -29,15 +32,6 @@ const cache = new CellMeasurerCache({
     defaultHeight: rowHeight,
     fixedWidth: true,
 })
-
-const createTextFromItem = (item: object, searchKeys: string[]) => {
-    return item
-        ? searchKeys
-              .filter(searchKey => !!item[searchKey])
-              .map(searchKey => item[searchKey])
-              .join(', ')
-        : ''
-}
 
 const useStyles = makeStyles(theme => ({
     root: { width: '100%', height: '100%' },
@@ -56,12 +50,15 @@ const ComboboxFieldView: React.FC<ComboboxFieldViewProps> = ({
     onKeyDownInput,
 
     uniqueKey,
+    labelKey,
     searchKeys,
 
     placeholder,
     rowsMax = 10,
 
     TextFieldSearchProps,
+    renderTextItem,
+    renderNoData,
 
     ...others
 }) => {
@@ -78,8 +75,6 @@ const ComboboxFieldView: React.FC<ComboboxFieldViewProps> = ({
     const previousIsOpen = usePrevious(combobox.isOpen)
     const previousScrollIndex = usePrevious(scrollIndex)
 
-    const textItem = createTextFromItem(combobox.selectedItem, searchKeys)
-
     const inputProps = combobox.getInputProps()
     delete inputProps.value
 
@@ -89,10 +84,11 @@ const ComboboxFieldView: React.FC<ComboboxFieldViewProps> = ({
                 multiline
                 ref={anchorEl}
                 {...others}
+                value={combobox.selectedItem?.[labelKey] || ''}
                 InputLabelProps={{ ...others.InputLabelProps, ...combobox.getLabelProps() }}
                 InputProps={{
                     ...others.InputProps,
-                    value: textItem,
+
                     readOnly: true,
                     endAdornment: (
                         <InputAdornment
@@ -118,31 +114,41 @@ const ComboboxFieldView: React.FC<ComboboxFieldViewProps> = ({
             <Popover
                 open={combobox.isOpen}
                 anchorEl={anchorEl.current}
+                anchorOrigin={{
+                    vertical: 'center',
+                    horizontal: 'center',
+                }}
+                transformOrigin={{
+                    vertical: 'center',
+                    horizontal: 'center',
+                }}
                 onClose={() => {
                     combobox.closeMenu()
                 }}
             >
                 <Paper square {...(combobox.isOpen ? { ...combobox.getMenuProps() } : {})}>
-                    <TextField
-                        {...TextFieldSearchProps}
-                        autoFocus
-                        fullWidth
-                        multiline
-                        inputRef={inputItemRef}
-                        placeholder={textItem || placeholder}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position='start'>
-                                    <SearchIcon />
-                                </InputAdornment>
-                            ),
-                            ...TextFieldSearchProps?.InputProps,
-                            ...inputProps,
-                            onKeyDown: onKeyDownInput,
-                        }}
-                        className={classes.searchInput}
-                        {...{ rowsMax }}
-                    />
+                    {searchKeys && searchKeys.length > 0 && (
+                        <TextField
+                            {...TextFieldSearchProps}
+                            autoFocus
+                            fullWidth
+                            multiline
+                            inputRef={inputItemRef}
+                            placeholder={combobox.selectedItem?.[labelKey] || placeholder}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position='start'>
+                                        <SearchIcon />
+                                    </InputAdornment>
+                                ),
+                                ...TextFieldSearchProps?.InputProps,
+                                ...inputProps,
+                                onKeyDown: onKeyDownInput,
+                            }}
+                            className={classes.searchInput}
+                            {...{ rowsMax }}
+                        />
+                    )}
 
                     <div
                         onMouseDown={event => {
@@ -154,6 +160,7 @@ const ComboboxFieldView: React.FC<ComboboxFieldViewProps> = ({
                             height={300}
                             rowHeight={cache.rowHeight}
                             rowCount={inputItems.length}
+                            noRowsRenderer={() => renderNoData?.(combobox?.inputValue) || <div></div>}
                             scrollToAlignment={
                                 previousIsOpen !== combobox.isOpen && combobox.isOpen ? 'center' : 'auto'
                             }
@@ -184,7 +191,7 @@ const ComboboxFieldView: React.FC<ComboboxFieldViewProps> = ({
                                             ref={() => {}} //กัน error
                                         >
                                             <ListItemText
-                                                primary={createTextFromItem(item, searchKeys)}
+                                                primary={renderTextItem?.(item, index) || item?.[labelKey]}
                                                 classes={{
                                                     primary: clsx({
                                                         [classes.selectedItemText]: beSelectedItem,

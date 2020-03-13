@@ -14,12 +14,13 @@ const ComboboxField: React.FC<ComboboxFieldProps> = ({
     validate,
     items = [],
     uniqueKey = 'value',
-    searchKeys = ['name'],
+    labelKey = 'name',
+    searchKeys,
     variant,
     ...others
 }) => {
     const comboboxField = useComboboxField({ form, fieldName, validate, items, uniqueKey, searchKeys })
-    return <ComboboxFieldView {...comboboxField} {...{ uniqueKey, searchKeys, variant }} {...others} />
+    return <ComboboxFieldView {...comboboxField} {...{ uniqueKey, labelKey, searchKeys, variant }} {...others} />
 }
 
 export default ComboboxField
